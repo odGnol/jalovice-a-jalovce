@@ -1,46 +1,62 @@
-"""
-jalovice-a-jalovce.py: druhý projekt do Engeto Online Python Akademie
-author: Long Do
-email: -
-discord: -
-"""
 
-from herniFunkce import vygenerovatCislo, validaceCisla, vyhodnotitCisla, vyhodnoceniHry
+import nastaveni as n
+import herni_funkce as hf
 
-oddelujici_cara = "-" * 60
-beziHra, novaHra = True, False
-vygenerovane_cislo = vygenerovatCislo(4)
+# TODO nastavení jazyka
+lang = "cs"
+nastaveni_jazyka = n.nastavit_jazyk(lang)
 
-print("Ahoj, vítejte ve hře Krávy a býci!", oddelujici_cara, "Právě bylo vygenerováno náhodné číslo.", "Započněme hru o krávách a býcích", oddelujici_cara, "Hádejte číslo: ", oddelujici_cara, sep="\n")
+def spustitHru() -> None:
+    hra_je_spustena = True
+    pocet_hadani, hranice_pokracovani = 0, 5
+    vysledek, stav_hry = "", ""
 
-while beziHra:
-  if novaHra:
-    vygenerovane_cislo = vygenerovatCislo(4)
-    novaHra = False
-  try:
-    print("Hra: ", vygenerovane_cislo)
-    hadane_cislo = input(">>> ")
-    
-    jeValidni = validaceCisla(hadane_cislo, vygenerovane_cislo)
-    
-    if jeValidni == True:
-      v = vyhodnotitCisla(hadane_cislo, vygenerovane_cislo)
-      vysledek = vyhodnoceniHry(v)
-      print(vysledek, oddelujici_cara, sep='\n')
+    hf.uvod_hry()
+    vygenerovane_cislo = hf.vygenerovat_cislo(4)
+
+    while hra_je_spustena:
+      #debug
+      print("nové číslo: ", vygenerovane_cislo)
       
-      if v['býci'] == 4:
-        pokracovaniVeHre = input("Hru jste vyhráli. Přejete si zahrát další hru? [A / Jakákoliv jiná klávesnice]")
-        if pokracovaniVeHre.upper() == "A":
-          novaHra = True
-          continue
-        else:
-          print("Končí hra...")
-          quit()
-          
-    else:
-      print("Konec - nesplněno.")
-      quit()
+      hadane_cislo = input(">>> ")
+      kontrola_hodnot = hf.validovat_cislo(hadane_cislo)
       
-  except ValueError:
-    print("Nezadali jste číslo. Hra končí.")
-    quit()
+      #debug
+      print("---- hádané číslo: ", hadane_cislo)
+
+      if kontrola_hodnot == True:
+        vysledek = hf.pocet_kravobyku(hadane_cislo, vygenerovane_cislo)
+        stav_hry = hf.vyhodnotit_hru(vysledek)
+
+      je_uhadnuto = hf.hodnoceni_hry(hadane_cislo, vygenerovane_cislo)
+
+      if je_uhadnuto == True:
+      # stav výhry a vyhodnocení
+         hodnoceni_hrace = hf.slovni_hodnoceni(pocet_hadani)
+
+         print(hodnoceni_hrace)
+         print(stav_hry)
+
+         if hf.pokracovat_ve_hre(nastaveni_jazyka["new_game"], lang):
+            pocet_hadani = 0
+            vygenerovane_cislo = hf.vygenerovat_cislo(4)
+            continue
+         else:
+            break
+      else:
+         # TODO vynulovat, ale počítat s celkovým počtem hádání
+         pocet_hadani += 1
+         if hranice_pokracovani == pocet_hadani:
+            print(stav_hry)
+            if hf.pokracovat_ve_hre(nastaveni_jazyka["continue_game"], lang):
+              pocet_hadani = 0
+              continue
+            else:
+              break
+         continue
+
+if __name__ == "__main__":
+    spustitHru()
+
+# TODO zvuk
+# TODO ukládání žebříčku [nick / nejvyšší skóre]
