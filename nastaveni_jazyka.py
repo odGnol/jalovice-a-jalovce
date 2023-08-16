@@ -47,3 +47,24 @@ def nastavit_jazyk(vybrany_jazyk: str) -> object:
     "attempts": number_of_attempts[vybrany_jazyk]
                }
   return nastaveni
+
+def vyber_jazyk() -> str:
+  i = ''
+  oddelujici_cara = "-" * 60
+  vyber_jazyka = ["Čeština", "English"]
+
+  while i not in vyber_jazyka:
+    print("Vyberte prosím jazyk. / Please choose the language. ? ", oddelujici_cara, sep="\n")
+
+    for index, jazyk in enumerate(vyber_jazyka):
+      print("{}) {}".format(index + 1, jazyk))
+
+    i = input(">>-> ")
+    print(oddelujici_cara, sep="\n")
+
+    if 0 < int(i) <= len(vyber_jazyka):
+      return "cs" if vyber_jazyka[int(i) - 1] == "Čeština" else "en"
+    else:
+     print("Pro češtinu klikněte prosím na klávesu 1. / For the english please click on key 2. ")
+     vyber_jazyk()
+  
