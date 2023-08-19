@@ -62,9 +62,11 @@ def vyber_jazyk() -> str:
     i = input(">>-> ")
     print(oddelujici_cara, sep="\n")
 
-    if 0 < int(i) <= len(vyber_jazyka):
+    if i is "" or not i.isnumeric():
+      vyber_jazyk()
+    elif 0 < int(i) <= len(vyber_jazyka):
       return "cs" if vyber_jazyka[int(i) - 1] == "Čeština" else "en"
     else:
-     print("Pro češtinu klikni prosím na klávesu 1. / For the english please click on key 2. ")
-     vyber_jazyk()
+      print("Pro češtinu klikni prosím na klávesu 1. / For the english please click on key 2. ")
+      vyber_jazyk()
   
