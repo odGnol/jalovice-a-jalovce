@@ -88,11 +88,38 @@ def vyhodnotit_hru(pocetKravByku = {"krávy": 0, "býci": 0}) -> str:
                                               {byci} {sklonovany_byk} {byci * '🐂' if byci > 0 else prazdne}
           """
 
+def kontrolovat_existenci(soubor: str) -> bool:
+    try:
+        my_file = open(soubor)
+        my_file.close()
+        return True
+    except FileNotFoundError:
+        return False
+
+
+def ulozit_data(pocet_vitezstvi: int) -> str:
+  from datetime import datetime as dt
+
+  current_time = f"{dt.now().day}. {dt.now().month}. {dt.now().year} {dt.now().hour}:{dt.now().minute}:{dt.now().second}"
+
+  soubor_existuje = kontrolovat_existenci("./seznam.txt")
+
+  player_name = input("Jméno hráče: ")
+  if soubor_existuje == False:
+    with open("./seznam.txt", mode="x") as f: 
+      f.write("") 
+
+  with open("./seznam.txt", "a") as f:
+      f.write(f"{player_name} - {pocet_vitezstvi} / {current_time} \n")
+
+  return "Data uložena."
+  
+
 def spustitHru() -> None:
     je_hra_nova: bool = True
     ma_hra_pokracovat: bool = False
     kontrola_hodnot: bool = False
-    pocet_hadani, hranice_pokracovani = 0, 5
+    pocet_vitezstvi, pocet_hadani, hranice_pokracovani = 0, 0, 5
     vysledek, stav_hry = "", ""
     hodnoceni_hrace = slovni_hodnoceni(pocet_hadani)
 
@@ -125,7 +152,16 @@ def spustitHru() -> None:
         je_uhadnuto = hodnoceni_hry(hadane_cislo, vygenerovane_cislo)
 
         if je_uhadnuto == True:
+          pocet_vitezstvi += 1
           print(stav_hry)
           print(hodnoceni_hrace)
+
+          ulozeni_vysledku = True if input ("Chcete uložit výsledky? ").upper() == "A" else False
+
+          if ulozeni_vysledku:
+            ulozit_data(pocet_vitezstvi)
+
+          # + umístění v žebříčku
+          # 1. Kontrolovat body a podle toho přeorganizovat 
 
           je_hra_nova = True if pokracovat_ve_hre(jazyk_hry["new_game"]) else quit()
