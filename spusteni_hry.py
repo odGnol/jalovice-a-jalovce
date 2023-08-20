@@ -1,5 +1,5 @@
 from herni_funkce import vygenerovat_cislo, validovat_cislo
-from vyhodnocovani import slovni_hodnoceni, vyhodnotit_hru, hodnoceni_hry, pocet_kravobyku
+from vyhodnocovani import slovni_hodnoceni, vyhodnotit_hru, srovnani_cisel, pocet_kravobyku
 from ukladani_hracu import ulozit_data 
 
 def uvod_hry() -> None:
@@ -15,51 +15,58 @@ def spustit_hru() -> None:
     ma_hra_pokracovat: bool = False
     kontrola_hodnot: bool = False
     pocet_vitezstvi = 0
-    pocet_hadani = 0
+    celkove_pokusy = 0
+    pocet_hadani_po_validaci = 0
     hranice_pokracovani = 5
-    vysledek = ""
-    stav_hry = ""
-    hodnoceni_hrace = slovni_hodnoceni(pocet_hadani)
+    hodnoceni_hrace = slovni_hodnoceni(celkove_pokusy)
+    vysledek: object = {"krávy": 0, "býci": 0}
+    stav_hry: str
 
     uvod_hry()
 
     while True:
+        if je_hra_nova:
+            vygenerovane_cislo = vygenerovat_cislo(4)
+            celkove_pokusy = 0
+            je_hra_nova = False
+        elif ma_hra_pokracovat:
+            celkove_pokusy = 0
+            ma_hra_pokracovat = False
       
-      if je_hra_nova:
-        vygenerovane_cislo = vygenerovat_cislo(4)
-        pocet_hadani = 0
-        je_hra_nova = False
-      elif ma_hra_pokracovat:
-        pocet_hadani = 0
-        ma_hra_pokracovat = False
-      
-      hadane_cislo = input(">>> ")
-      kontrola_hodnot = validovat_cislo(hadane_cislo)
-      
-      #debug
-      print("hádané číslo: ", hadane_cislo, "nové číslo: ", vygenerovane_cislo, "stav hadani: ", kontrola_hodnot, "pocet hadani ", pocet_hadani, sep="\n")
-
-      if kontrola_hodnot is True:
-        vysledek = pocet_kravobyku(hadane_cislo, vygenerovane_cislo)
+        hadane_cislo = input(">>> ")
+        kontrola_hodnot = validovat_cislo(hadane_cislo)
+        celkove_pokusy += 1
         stav_hry = vyhodnotit_hru(vysledek)
-        je_uhadnuto = hodnoceni_hry(hadane_cislo, vygenerovane_cislo)
 
-        if je_uhadnuto == True:
-          pocet_vitezstvi += 1
-          print(stav_hry)
-          print(hodnoceni_hrace)
+        if kontrola_hodnot == True:
+            vysledek = pocet_kravobyku(hadane_cislo, vygenerovane_cislo)
+            cisla_se_rovnaji = srovnani_cisel(hadane_cislo, vygenerovane_cislo)
 
-          ulozeni_vysledku = True if input ("Chcete uložit výsledky? ").upper() == "A" else False
+            print("if - True", vysledek)
 
-          if ulozeni_vysledku:
-            ulozit_data(pocet_hadani)
+            if cisla_se_rovnaji == True:
+                pocet_vitezstvi += 1
+                stav_hry = vyhodnotit_hru(vysledek)
 
-          je_hra_nova = True if pokracovat_ve_hre("Chceš novou hru? [A / Jakákoli klávesa]") else quit()
+                print(stav_hry)
+                print(hodnoceni_hrace)
+                ulozeni_vysledku = True if input ("Chcete uložit výsledky? ").upper() == "A" else False
+                
+                if ulozeni_vysledku:
+                    ulozit_data(celkove_pokusy, pocet_vitezstvi)
+
+                je_hra_nova = True if pokracovat_ve_hre("Chceš novou hru? [A / Jakákoli klávesa]") else quit()
+            
         else:
-          pocet_hadani += 1
+            print("Číslo jsi zatím neuhádl. To dáš! Zaber.")
+            pocet_hadani_po_validaci += 1
+            print("else - False: ", vysledek)
 
-          if pocet_hadani == hranice_pokracovani:
+        if (celkove_pokusy % hranice_pokracovani) == 0:
+            stav_hry = vyhodnotit_hru(vysledek) if kontrola_hodnot == True else vyhodnotit_hru({"krávy": 0, "býci": 0})
+
             print(stav_hry)
+
             ma_hra_pokracovat = True if pokracovat_ve_hre("Moc to nejde. Chceš pokračovat? [A / Jakákoli klávesa]") else quit()
 
 def pokracovat_ve_hre(dotaz_na_pokracovani: str) -> bool:

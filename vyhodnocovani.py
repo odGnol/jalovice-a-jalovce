@@ -1,5 +1,5 @@
-def hodnoceni_hry(hadane_cislo: int, vygenerovane_cislo: int) -> bool:
-  return hadane_cislo == vygenerovane_cislo
+def srovnani_cisel(hadane_cislo: int, vygenerovane_cislo: int) -> bool:
+    return hadane_cislo == vygenerovane_cislo
 
 def slovni_hodnoceni(pocet_hadani: int) -> str:
   if pocet_hadani == 0:
@@ -11,11 +11,14 @@ def slovni_hodnoceni(pocet_hadani: int) -> str:
   
 def pocet_kravobyku(hracovo_cislo: str, vygenerovane_cislo: int) -> object:
     vyhodnoceni = {"krávy": 0, "býci": 0}
-    for index, char in enumerate(vygenerovane_cislo):
-      if char == hracovo_cislo[index]:
-        vyhodnoceni["krávy"] += 1
-      elif hracovo_cislo[index] in vygenerovane_cislo and char != hracovo_cislo[index]:
-        vyhodnoceni["krávy"] += 1
+
+    if hracovo_cislo.isnumeric():
+        for index, char in enumerate(vygenerovane_cislo):
+            if char == hracovo_cislo[index]:
+                vyhodnoceni["býci"] += 1
+            elif hracovo_cislo[index] in vygenerovane_cislo and char != hracovo_cislo[index]:
+                vyhodnoceni["krávy"] += 1
+        return vyhodnoceni
 
     return vyhodnoceni
 

@@ -11,7 +11,7 @@ def vygenerovat_cislo(pocetCislic: int) -> int:
   return vygenerovaneCislo
 
 def validovat_cislo(hadane_cislo: any) -> bool:
-    if hadane_cislo is "":
+    if hadane_cislo == "":
       print ("Nebylo nic doplněno, zkus to ještě jednou.")
       return False
     
